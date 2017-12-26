@@ -9,6 +9,9 @@ Vagrant.configure("2") do |config|
       netmask: "255.255.255.0", virtualbox__intnet: "srv_net1"
     srv.vm.provision "file", source: "configs/srv1.sh", destination: "/home/vagrant/srv1.sh"
     srv.vm.provision "shell", inline: "sudo /bin/bash /home/vagrant/srv1.sh"
+    srv.vm.provider "virtualbox" do |v|
+     v.customize ["modifyvm", :id, "--memory", "512"]
+    end
   end
 
   config.vm.define "vsrx1" do |srx|
@@ -19,6 +22,11 @@ Vagrant.configure("2") do |config|
     srx.vm.provider "virtualbox" do |v|
      v.check_guest_additions = false
     end
+    
+    srx.vm.provider "virtualbox" do |v|
+     v.customize ["modifyvm", :id, "--memory", "1024"]
+    end
+
 
     srx.vm.provision "file", source: "configs/initial.cfg", destination: "/cf/root/initial.cfg"
     srx.vm.provision :host_shell do |host_shell|
@@ -33,6 +41,9 @@ Vagrant.configure("2") do |config|
      netmask: "255.255.255.0", virtualbox__intnet: "srv_net2"
     srv.vm.provision "file", source: "configs/srv2.sh", destination: "/home/vagrant/srv2.sh"
     srv.vm.provision "shell", inline: "sudo /bin/bash /home/vagrant/srv2.sh"
+    srv.vm.provider "virtualbox" do |v|
+     v.customize ["modifyvm", :id, "--memory", "512"]
+    end
   end
 
 end
