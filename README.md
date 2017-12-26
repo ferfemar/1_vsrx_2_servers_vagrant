@@ -27,8 +27,8 @@ ge-0/0/0 +-------------+
 Requirements
 ============
 
-Vagrant w/ plugins: junos-vagrant, alpine-vagrant
-Virtualbox
+- Vagrant with plugins: junos-vagrant, alpine-vagrant
+- Virtualbox
 
 Usage
 =====
