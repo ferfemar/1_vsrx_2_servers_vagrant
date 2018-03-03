@@ -2,6 +2,8 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
+  config.ssh.insert_key = false
+
   config.vm.define "srv1" do |srv|
     srv.vm.box = "maier/alpine-3.6-x86_64"
     srv.vm.synced_folder ".", "/vagrant", disabled: true
@@ -10,7 +12,7 @@ Vagrant.configure("2") do |config|
     srv.vm.provision "file", source: "configs/srv1.sh", destination: "/home/vagrant/srv1.sh"
     srv.vm.provision "shell", inline: "sudo /bin/bash /home/vagrant/srv1.sh"
     srv.vm.provider "virtualbox" do |v|
-     v.customize ["modifyvm", :id, "--memory", "512"]
+     v.customize ["modifyvm", :id, "--memory", "256"]
     end
   end
 
@@ -24,13 +26,13 @@ Vagrant.configure("2") do |config|
     end
     
     srx.vm.provider "virtualbox" do |v|
-     v.customize ["modifyvm", :id, "--memory", "1024"]
+     v.customize ["modifyvm", :id, "--memory", "512"]
     end
 
 
     srx.vm.provision "file", source: "configs/initial.cfg", destination: "/cf/root/initial.cfg"
     srx.vm.provision :host_shell do |host_shell|
-     host_shell.inline = 'vagrant ssh vsrx1 -c "/usr/sbin/cli -f /cf/root/initial.cfg"'
+     host_shell.inline = "vagrant ssh vsrx1 -c 'cli -f /cf/root/initial.cfg'"
     end
   end
 
@@ -42,7 +44,7 @@ Vagrant.configure("2") do |config|
     srv.vm.provision "file", source: "configs/srv2.sh", destination: "/home/vagrant/srv2.sh"
     srv.vm.provision "shell", inline: "sudo /bin/bash /home/vagrant/srv2.sh"
     srv.vm.provider "virtualbox" do |v|
-     v.customize ["modifyvm", :id, "--memory", "512"]
+     v.customize ["modifyvm", :id, "--memory", "256"]
     end
   end
 
