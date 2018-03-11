@@ -5,12 +5,29 @@ Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
 
   config.vm.define "srv1" do |srv|
+    # This box seems to be working the best with the vagrant-alpine plugin
     srv.vm.box = "maier/alpine-3.6-x86_64"
+    # Don't need synced folder
     srv.vm.synced_folder ".", "/vagrant", disabled: true
+    # Network settings, autoconfiguration is handeled by the vagrant-alpine plugin
     srv.vm.network "private_network", ip: "10.10.10.2",
       netmask: "255.255.255.0", virtualbox__intnet: "srv_net1"
+    # Simple provision - copy a bash script over and run it
     srv.vm.provision "file", source: "configs/srv1.sh", destination: "/home/vagrant/srv1.sh"
     srv.vm.provision "shell", inline: "sudo /bin/bash /home/vagrant/srv1.sh"
+    # Tune RAM allocated - 256MB is OK for this box.  
+    srv.vm.provider "virtualbox" do |v|
+     v.customize ["modifyvm", :id, "--memory", "256"]
+    end
+  end
+
+  config.vm.define "srv2" do |srv|
+    srv.vm.box = "maier/alpine-3.6-x86_64"
+    srv.vm.synced_folder ".", "/vagrant", disabled: true
+    srv.vm.network "private_network", ip: "10.20.20.2", 
+     netmask: "255.255.255.0", virtualbox__intnet: "srv_net2"
+    srv.vm.provision "file", source: "configs/srv2.sh", destination: "/home/vagrant/srv2.sh"
+    srv.vm.provision "shell", inline: "sudo /bin/bash /home/vagrant/srv2.sh"
     srv.vm.provider "virtualbox" do |v|
      v.customize ["modifyvm", :id, "--memory", "256"]
     end
@@ -33,22 +50,11 @@ Vagrant.configure("2") do |config|
      v.customize ["modifyvm", :id, "--memory", "512"]
     end
 
-
+    #Copies the configuration file to the device filesystem
     srx.vm.provision "file", source: "configs/initial.cfg", destination: "/cf/root/initial.cfg"
+    #Uses host_shell plugin to send command (to run the config file) over ssh to the SRX
     srx.vm.provision :host_shell do |host_shell|
      host_shell.inline = "vagrant ssh vsrx1 -c 'cli -f /cf/root/initial.cfg'"
-    end
-  end
-
-  config.vm.define "srv2" do |srv|
-    srv.vm.box = "maier/alpine-3.6-x86_64"
-    srv.vm.synced_folder ".", "/vagrant", disabled: true
-    srv.vm.network "private_network", ip: "10.20.20.2", 
-     netmask: "255.255.255.0", virtualbox__intnet: "srv_net2"
-    srv.vm.provision "file", source: "configs/srv2.sh", destination: "/home/vagrant/srv2.sh"
-    srv.vm.provision "shell", inline: "sudo /bin/bash /home/vagrant/srv2.sh"
-    srv.vm.provider "virtualbox" do |v|
-     v.customize ["modifyvm", :id, "--memory", "256"]
     end
   end
 
