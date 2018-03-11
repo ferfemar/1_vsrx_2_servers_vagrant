@@ -17,14 +17,18 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "vsrx1" do |srx|
-    srx.vm.box = "juniper/ffp-12.1X47-D15.4" 
+    # Juniper provided public box is used
+    srx.vm.box = "juniper/ffp-12.1X47-D15.4"
+    # No sense in using synced folders with vsrx  
     srx.vm.synced_folder ".", "/vagrant", disabled: true
+    # Configuration of network adapters - junos.vagrant plugin also auto configures the device
     srx.vm.network "private_network", ip: "10.10.10.1", nic_type: 'virtio', virtualbox__intnet: "srv_net1"
     srx.vm.network "private_network", ip: "10.20.20.1", nic_type: 'virtio', virtualbox__intnet: "srv_net2" 
+    # Disable vbox additions
     srx.vm.provider "virtualbox" do |v|
      v.check_guest_additions = false
     end
-    
+    # Tune RAM allocated for the VM - 512 is a minimum and may cause problems, default is 2048
     srx.vm.provider "virtualbox" do |v|
      v.customize ["modifyvm", :id, "--memory", "512"]
     end
