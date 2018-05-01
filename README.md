@@ -3,6 +3,8 @@ Simple vSRX w/ two servers topology
 
 A Vagrant topology using official Juniper vSRX image and two Alpine Linux servers for testing.
 
+Blogpost: http://overloadedbits.eu/vagrant_topologies/
+
 Topology
 ========
 ```
